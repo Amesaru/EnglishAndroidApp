@@ -1,63 +1,47 @@
 package com.example.test
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doAfterTextChanged
-import com.example.test.databinding.ActivityMainBinding
+import androidx.core.view.GravityCompat
+import com.example.test.databinding.ActivityChangeTelegramBinding
+import com.example.test.databinding.ActivityStudentProfileBinding
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 
+class ChangeTelegram : AppCompatActivity() {
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding : ActivityChangeTelegramBinding
     private lateinit var builder : AlertDialog.Builder
 
-    private fun isEmailValid(eMail: String?): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(eMail).matches()
-    }
-
-    private fun showAlert(Title : String, Message : String) {
+    private fun showAlert(Title: String, Message: String) {
         builder.setTitle(Title)
             .setMessage(Message)
             .setCancelable(true)
             .show()
     }
 
-    private fun log(Message : String) {
+    private fun log(Message: String) {
         Log.d("LoginLog", Message)
     }
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityChangeTelegramBinding.inflate(layoutInflater)
         builder = AlertDialog.Builder(this)
         setContentView(binding.root)
 
-        binding.emailField.doAfterTextChanged {
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                binding.emailField.error = "Неккоректная почта"
-            }
-            if (binding.emailField.text.toString().trim().isEmpty()) {
-                binding.emailField.error = null
-            }
-        }
-        binding.signInButton.setOnClickListener {
+
+        binding.confirmButton.setOnClickListener {
             if (binding.emailField.text.toString().trim().isEmpty()) {
                 showAlert("Ошибка", "Не введена почта")
                 return@setOnClickListener
@@ -73,13 +57,13 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val url = "http://localhost:8080/authApi/sign-in-request"
+            val url = "http://localhost:8080/authApi/confirmTelegram"
 
             val urlObj = URL(url)
 
-            data class Body(val email: String, val password: String)
+            data class Body(val telegram: String)
 
-            val requestBody = Body(binding.emailField.text.toString(), binding.passwordField.text.toString())
+            val requestBody = Body(binding.keyField.text.toString())
 
             val jsonData = Gson().toJson(requestBody)
 
@@ -87,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 
             connection.requestMethod = "POST"
             connection.setRequestProperty("Content-Type", "application/json")
+            connection.setRequestProperty("Authorization", "Bearer" + GlobalVars.accessToken)
 
             connection.doOutput = true
             connection.doInput = true
@@ -133,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                 val jsonObject = jsonElement.asJsonObject
                 val success = jsonObject.get("success").asBoolean
                 if (success == false) {
-                    showAlert("Ошибка", "Неверная почта или пароль")
+                    showAlert("Ошибка", "Ошибка при смене телеграма")
                 }
 
                 val data = jsonObject.getAsJsonObject("data")
@@ -150,23 +135,10 @@ class MainActivity : AppCompatActivity() {
 
                 val role = jwt.get("role", Int::class.java)
 
-                if (role == 0) {
-                    startActivity(Intent(this, studentProfile::class.java))
-                } else {
-                    startActivity(Intent(this, TeacherProfile::class.java))
-                }
+                startActivity(Intent(this, studentProfile::class.java))
 
             } else {
                 println("Invalid JSON response.")
             }
-        }
-
-        binding.registrationButton.setOnClickListener {
-            startActivity(Intent(this, Registration::class.java))
-        }
-
-        binding.forgotPassword.setOnClickListener {
-            startActivity(Intent(this, ChangePassword::class.java))
-        }
     }
 }

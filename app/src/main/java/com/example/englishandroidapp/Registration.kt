@@ -1,28 +1,26 @@
 package com.example.test
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.example.test.databinding.ActivityMainBinding
+import com.example.test.databinding.ActivityRegistrationBinding
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 
+class Registration : AppCompatActivity() {
 
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding : ActivityRegistrationBinding
     private lateinit var builder : AlertDialog.Builder
 
     private fun isEmailValid(eMail: String?): Boolean {
@@ -40,12 +38,9 @@ class MainActivity : AppCompatActivity() {
         Log.d("LoginLog", Message)
     }
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityRegistrationBinding.inflate(layoutInflater)
         builder = AlertDialog.Builder(this)
         setContentView(binding.root)
 
@@ -57,23 +52,28 @@ class MainActivity : AppCompatActivity() {
                 binding.emailField.error = null
             }
         }
-        binding.signInButton.setOnClickListener {
+        binding.confirmButton.setOnClickListener {
             if (binding.emailField.text.toString().trim().isEmpty()) {
                 showAlert("Ошибка", "Не введена почта")
                 return@setOnClickListener
             }
 
             if (binding.passwordField.text.toString().trim().isEmpty()) {
-                showAlert("Ошибка", "Не введен пароль")
+                showAlert("Ошибка", "Не введен новый пароль")
                 return@setOnClickListener
             }
 
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                showAlert("Ошибка", "Некорректная почта")
+            if (binding.passwordField2.text.toString().trim().isEmpty()) {
+                showAlert("Ошибка", "Не введено подтверждение пароля")
                 return@setOnClickListener
             }
 
-            val url = "http://localhost:8080/authApi/sign-in-request"
+            if (!binding.passwordField.text.toString().equals(binding.passwordField2.text.toString())) {
+                showAlert("Ошибка", "Пароли не совпадают")
+                return@setOnClickListener
+            }
+
+            val url = "http://localhost:8080/authApi/registration-request-mobile"
 
             val urlObj = URL(url)
 

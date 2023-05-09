@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Профиль"/>
+        <item
+            android:id="@+id/nav_lesson"
+            android:icon="@drawable/baseline_menu_book_24"
+            android:title="Занятие"/>
+        <item
+            android:id="@+id/nav_homework"
+            android:icon="@drawable/baseline_work_24"
+            android:title="ДЗ"/>
+        <item
+            android:id="@+id/nav_teacher"
+            android:icon="@drawable/baseline_supervised_user_circle_24"
+            android:title="Учитель"/>
+    </group>
+</menu>
