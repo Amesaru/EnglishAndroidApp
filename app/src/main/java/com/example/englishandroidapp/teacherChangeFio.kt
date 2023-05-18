@@ -5,37 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
-import com.example.test.databinding.ActivityChangePasswordBinding
-import com.example.test.databinding.ActivityMainBinding
+import com.example.test.databinding.ActivityTeacherChangeFioBinding
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import java.io.BufferedReader
-import java.io.DataOutputStream
 import java.io.IOException
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 
-class ChangePassword : AppCompatActivity() {
+class teacherChangeFio : AppCompatActivity() {
+    data class Body(val newFio: String)
 
-    data class Body(val email: String)
-
-    private lateinit var binding : ActivityChangePasswordBinding
+    private lateinit var binding : ActivityTeacherChangeFioBinding
     private lateinit var builder : AlertDialog.Builder
-
-    private fun isEmailValid(eMail: String?): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(eMail).matches()
-    }
 
     private fun showAlert(Title : String, Message : String) {
         builder.setTitle(Title)
@@ -45,38 +30,23 @@ class ChangePassword : AppCompatActivity() {
     }
 
     private fun log(Message : String) {
-        Log.d("ChangePasswordLog", Message)
+        Log.d("TeacherChangeFioLog", Message)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityChangePasswordBinding.inflate(layoutInflater)
+        binding = ActivityTeacherChangeFioBinding.inflate(layoutInflater)
         builder = AlertDialog.Builder(this)
         setContentView(binding.root)
 
-        binding.emailField.doAfterTextChanged {
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                binding.emailField.error = "Неккоректная почта"
-            }
-            if (binding.emailField.text.toString().trim().isEmpty()) {
-                binding.emailField.error = null
-            }
-        }
-
         binding.confirmButton.setOnClickListener {
-            if (binding.emailField.text.toString().trim().isEmpty()) {
-                showAlert("Ошибка", "Не введена почта")
-                return@setOnClickListener
-            }
-
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                showAlert("Ошибка", "Некорректная почта")
+            if (binding.FIOField.text.toString().trim().isEmpty()) {
+                showAlert("Ошибка", "Не ввели ФИО")
                 return@setOnClickListener
             }
 
             log("Start")
-
-            val requestBodyClass = Body(binding.emailField.text.toString())
+            val requestBodyClass = Body(binding.FIOField.text.toString())
 
             val jsonData = Gson().toJson(requestBodyClass)
 
@@ -85,17 +55,18 @@ class ChangePassword : AppCompatActivity() {
             val requestBody = jsonData.toRequestBody()
 
             val request = Request.Builder()
-                .url("http://10.0.2.2:8080/authApi/startChangePassword-mobile")
+                .url("http://10.0.2.2:8080/teacherProfileApi/setFio")
                 .post(requestBody)
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + GlobalVars.accessToken)
                 .build()
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     log("GetResponse")
                     val responseCode = response.code
-                    if (responseCode == 500) {
-                        log("Response code 500")
+                    if (responseCode != 200) {
+                        log("Response code $responseCode")
                         showAlert("Ошибка", "Попробуйте снова")
                         return
                     }
@@ -111,7 +82,18 @@ class ChangePassword : AppCompatActivity() {
                             }
                             return
                         } else {
-                            startActivity(Intent(this@ChangePassword, ChangePasswordSecond::class.java))
+                            runOnUiThread {
+                                builder.setTitle("Успех")
+                                    .setMessage("ФИО успешно изменено")
+                                    .setCancelable(true)
+                                    .setPositiveButton("Ок") {
+                                            dialogInterface, it ->
+                                        finish()
+                                        startActivity(Intent(this@teacherChangeFio, TeacherProfile::class.java))
+                                    }
+                                    .show()
+                            }
+
                         }
 
                     }
@@ -137,9 +119,8 @@ class ChangePassword : AppCompatActivity() {
             })
         }
 
-        binding.backToLogin.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+        binding.backToProfile.setOnClickListener {
+            startActivity(Intent(this, TeacherProfile::class.java))
         }
-
     }
 }

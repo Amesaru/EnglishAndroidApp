@@ -5,23 +5,29 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import com.auth0.jwt.JWT
 import com.example.test.databinding.ActivityChangePasswordSecondBinding
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.io.BufferedReader
 import java.io.DataOutputStream
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
 class ChangePasswordSecond : AppCompatActivity() {
+    data class Body(val newPassword: String)
 
     private lateinit var binding : ActivityChangePasswordSecondBinding
     private lateinit var builder : AlertDialog.Builder
-
-    private fun isEmailValid(eMail: String?): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(eMail).matches()
-    }
 
     private fun showAlert(Title : String, Message : String) {
         builder.setTitle(Title)
@@ -30,14 +36,18 @@ class ChangePasswordSecond : AppCompatActivity() {
             .show()
     }
 
+    private fun log(Message : String) {
+        Log.d("ChangePasswordSecondLog", Message)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChangePasswordSecondBinding.inflate(layoutInflater)
         builder = AlertDialog.Builder(this)
         setContentView(binding.root)
 
-        binding.changePasswordButton.setOnClickListener {
-            if (binding.keyField.text.toString().trim().isEmpty()) {
+        binding.confirmButton.setOnClickListener {
+            if (binding.codeField.text.toString().trim().isEmpty()) {
                 showAlert("Ошибка", "Не введен код")
                 return@setOnClickListener
             }
@@ -57,76 +67,81 @@ class ChangePasswordSecond : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val url = "http://localhost:8080/authApi/restore-password/"
+            log("Start")
+            val requestBodyClass = Body(binding.newPasswordField.text.toString())
 
-            val urlObj = URL(url)
+            val jsonData = Gson().toJson(requestBodyClass)
 
-            data class Body(val email: String)
+            log(jsonData)
 
-            val requestBody = Body(binding.newPasswordField.text.toString())
+            val client = OkHttpClient()
 
-            val jsonData = Gson().toJson(requestBody)
+            val requestBody = jsonData.toRequestBody()
 
-            val connection = urlObj.openConnection() as HttpURLConnection
 
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json")
+            log("http://10.0.2.2:8080/authApi/restore-password/" + binding.codeField.text.toString())
+            val request = Request.Builder()
+                .url("http://10.0.2.2:8080/authApi/restore-password/" + binding.codeField.text.toString())
+                .post(requestBody)
+                .header("Content-Type", "application/json")
+                .build()
+            log(request.toString())
+            client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    log("GetResponse")
+                    val responseCode = response.code
+                    if (responseCode == 500) {
+                        log("Response code 500")
+                        showAlert("Ошибка", "Попробуйте снова")
+                        return
+                    }
+                    val responseBodyString = response.body?.string()
+                    if (responseBodyString != null) {
+                        log(responseBodyString)
+                        val jsonObject = Gson().fromJson(responseBodyString, JsonObject::class.java)
+                        val success = jsonObject.get("success").asBoolean
+                        if (success == false) {
+                            log("no success")
+                            runOnUiThread {
+                                showAlert("Ошибка", jsonObject.get("reason").asString)
+                            }
+                            return
+                        } else {
+                            runOnUiThread {
+                                builder.setTitle("Успех")
+                                    .setMessage("Пароль успешно изменен")
+                                    .setCancelable(true)
+                                    .setPositiveButton("Ок") {
+                                            dialogInterface, it ->
+                                        finish()
+                                        startActivity(Intent(this@ChangePasswordSecond, MainActivity::class.java))
+                                    }
+                                    .show()
+                            }
 
-            connection.doOutput = true
-            connection.doInput = true
+                        }
 
-            val jsonDataConverted = jsonData.toByteArray(Charsets.UTF_8)
-
-//                // Set the content length of the request body
-//                connection.setRequestProperty("Content-Length", data.size.toString())
-
-            val outputStream = DataOutputStream(connection.outputStream)
-            outputStream.write(jsonDataConverted)
-            outputStream.flush()
-            outputStream.close()
-
-            val responseCode = connection.responseCode
-
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = StringBuilder()
-            var line: String?
-
-            while (reader.readLine().also { line = it } != null) {
-                response.append(line)
-            }
-
-            reader.close()
-            connection.disconnect()
-
-            if (responseCode == 500) {
-                Log.d("LoginLog", "Response code 500")
-            }
-
-            val jsonResponse = response.toString()
-
-            val gson = Gson()
-            val jsonElement: JsonElement = gson.fromJson(jsonResponse, JsonElement::class.java)
-
-            // Access the accessToken field if it exists
-            if (jsonElement.isJsonObject) {
-                val jsonObject = jsonElement.asJsonObject
-                val success = jsonObject.get("success").asBoolean
-                if (success == false) {
-                    showAlert("Ошибка", "Ошибка во время изменения пароля")
+                    }
                 }
 
-                builder.setTitle("Успех")
-                    .setMessage("Пароль успешно изменен")
-                    .setCancelable(true)
-                    .setPositiveButton("Ок") {
-                            dialogInterface, it ->
-                        finish()
-                        startActivity(Intent(this, MainActivity::class.java))
+                override fun onFailure(call: Call, e: IOException) {
+                    // Handle failure/error
+                    when (e) {
+                        is IOException -> {
+                            log("IO")
+                            e.printStackTrace()
+                        }
+                        is RuntimeException -> {
+                            log("RunTime")
+                            e.printStackTrace()
+                        }
+                        else -> {
+                            log("Other")
+                            e.printStackTrace()
+                        }
                     }
-                    .show()
-            } else {
-                println("Invalid JSON response.")
-            }
+                }
+            })
         }
     }
 }

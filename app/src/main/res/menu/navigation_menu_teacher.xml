@@ -19,7 +19,7 @@
             android:icon="@drawable/baseline_work_24"
             android:title="Создать ДЗ"/>
         <item
-            android:id="@+id/nav_teacher"
+            android:id="@+id/nav_grade"
             android:icon="@drawable/baseline_brush_24"
             android:title="Оценка ДЗ"/>
     </group>

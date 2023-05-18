@@ -1,102 +1,79 @@
 package com.example.test
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
-import com.example.test.databinding.ActivityChangePasswordBinding
-import com.example.test.databinding.ActivityMainBinding
+import com.example.test.databinding.ActivityStudentChangeTelegramBinding
+import com.example.test.databinding.ActivityTeacherChangeTelegramBinding
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody
 import okhttp3.Response
-import java.io.BufferedReader
-import java.io.DataOutputStream
 import java.io.IOException
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 
-class ChangePassword : AppCompatActivity() {
+class TeacherChangeTelegram : AppCompatActivity() {
 
-    data class Body(val email: String)
+    private lateinit var binding: ActivityTeacherChangeTelegramBinding
+    private lateinit var builder: AlertDialog.Builder
 
-    private lateinit var binding : ActivityChangePasswordBinding
-    private lateinit var builder : AlertDialog.Builder
-
-    private fun isEmailValid(eMail: String?): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(eMail).matches()
-    }
-
-    private fun showAlert(Title : String, Message : String) {
+    private fun showAlert(Title: String, Message: String) {
         builder.setTitle(Title)
             .setMessage(Message)
             .setCancelable(true)
             .show()
     }
 
-    private fun log(Message : String) {
-        Log.d("ChangePasswordLog", Message)
+    private fun log(Message: String) {
+        Log.d("TeacherChangeTelegramLog", Message)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityChangePasswordBinding.inflate(layoutInflater)
+        binding = ActivityTeacherChangeTelegramBinding.inflate(layoutInflater)
         builder = AlertDialog.Builder(this)
         setContentView(binding.root)
+        log(GlobalVars.TelegramDeepLink)
 
-        binding.emailField.doAfterTextChanged {
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                binding.emailField.error = "Неккоректная почта"
-            }
-            if (binding.emailField.text.toString().trim().isEmpty()) {
-                binding.emailField.error = null
+        binding.telegramButton.setOnClickListener {
+            val deepLinkUri = Uri.parse(GlobalVars.TelegramDeepLink)
+            val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
+            try {
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                log("ActivityNotFound")
+                e.printStackTrace()
             }
         }
 
         binding.confirmButton.setOnClickListener {
-            if (binding.emailField.text.toString().trim().isEmpty()) {
-                showAlert("Ошибка", "Не введена почта")
-                return@setOnClickListener
-            }
-
-            if (!isEmailValid(binding.emailField.text.toString())) {
-                showAlert("Ошибка", "Некорректная почта")
-                return@setOnClickListener
-            }
-
             log("Start")
-
-            val requestBodyClass = Body(binding.emailField.text.toString())
-
-            val jsonData = Gson().toJson(requestBodyClass)
 
             val client = OkHttpClient()
 
-            val requestBody = jsonData.toRequestBody()
-
             val request = Request.Builder()
-                .url("http://10.0.2.2:8080/authApi/startChangePassword-mobile")
-                .post(requestBody)
+                .url("http://10.0.2.2:8080/teacherProfileApi/confirmTelegram")
+                .post(RequestBody.create(null, ""))
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + GlobalVars.accessToken)
                 .build()
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     log("GetResponse")
                     val responseCode = response.code
-                    if (responseCode == 500) {
-                        log("Response code 500")
-                        showAlert("Ошибка", "Попробуйте снова")
+                    if (responseCode != 200) {
+                        log("Response code $responseCode")
+                        runOnUiThread {
+                            showAlert("Ошибка", "Попробуйте снова")
+                        }
                         return
                     }
                     val responseBodyString = response.body?.string()
@@ -109,9 +86,22 @@ class ChangePassword : AppCompatActivity() {
                             runOnUiThread {
                                 showAlert("Ошибка", jsonObject.get("reason").asString)
                             }
-                            return
                         } else {
-                            startActivity(Intent(this@ChangePassword, ChangePasswordSecond::class.java))
+                            runOnUiThread {
+                                builder.setTitle("Успех")
+                                    .setMessage("Телеграм успешно подтвержден")
+                                    .setCancelable(true)
+                                    .setPositiveButton("Ок") { dialogInterface, it ->
+                                        finish()
+                                        startActivity(
+                                            Intent(
+                                                this@TeacherChangeTelegram,
+                                                studentProfile::class.java
+                                            )
+                                        )
+                                    }
+                                    .show()
+                            }
                         }
 
                     }
@@ -137,9 +127,8 @@ class ChangePassword : AppCompatActivity() {
             })
         }
 
-        binding.backToLogin.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+        binding.backToProfile.setOnClickListener {
+            startActivity(Intent(this, TeacherProfile::class.java))
         }
-
     }
 }

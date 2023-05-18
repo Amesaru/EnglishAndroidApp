@@ -7,6 +7,33 @@
     tools:context=".ChangeFIO">
 
     <TextView
+        android:id="@+id/backToProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Вход"
+        android:textColor="@color/Basic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.084"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.019" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_new_24"
+        app:tint="@color/Basic" />
+
+    <TextView
         android:id="@+id/textView19"
         android:layout_width="274dp"
         android:layout_height="21dp"
@@ -28,6 +55,8 @@
         android:layout_height="30dp"
         android:autoSizeTextType="none"
         android:backgroundTint="@color/Basic"
+        android:background="@drawable/round_button"
+        android:textColor="#FBFBFB"
         android:paddingHorizontal="0.dp"
         android:paddingVertical="0.dp"
         android:text="Подтвердить"
@@ -40,7 +69,7 @@
         app:layout_constraintVertical_bias="0.754" />
 
     <EditText
-        android:id="@+id/keyField"
+        android:id="@+id/codeField"
         android:layout_width="300dp"
         android:layout_height="41dp"
         android:backgroundTint="@color/Basic"
@@ -74,6 +103,8 @@
         android:layout_height="30dp"
         android:autoSizeTextType="none"
         android:backgroundTint="@color/Basic"
+        android:background="@drawable/round_button"
+        android:textColor="#FBFBFB"
         android:paddingHorizontal="0.dp"
         android:paddingVertical="0.dp"
         android:text="Запросить звонок"
@@ -91,7 +122,7 @@
         android:layout_height="41dp"
         android:backgroundTint="@color/Basic"
         android:ems="10"
-        android:hint="Телефон"
+        android:hint="Телефон +79991234567"
         android:inputType="textEmailAddress"
         android:textColorHint="@drawable/selector"
         android:textSize="12sp"
@@ -124,6 +155,7 @@
         android:layout_height="wrap_content"
         android:text="Введение телефона"
         android:textColor="@color/Basic"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

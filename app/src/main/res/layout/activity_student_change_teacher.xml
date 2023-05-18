@@ -12,20 +12,23 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/openSidebar"
+            android:id="@+id/confirmButton"
             android:layout_width="110dp"
             android:layout_height="31dp"
             android:autoSizeTextType="none"
+            android:background="@drawable/round_button"
             android:backgroundTint="@color/Basic"
             android:paddingHorizontal="0.dp"
             android:paddingVertical="0.dp"
             android:text="Подтвердить"
             android:textAllCaps="false"
+            android:textColor="#FBFBFB"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.412" />
+            app:layout_constraintVertical_bias="0.43" />
 
         <ImageView
             android:id="@+id/imageView8"
@@ -40,7 +43,7 @@
             app:srcCompat="@drawable/englishsecond" />
 
         <ImageView
-            android:id="@+id/imageView7"
+            android:id="@+id/openSidebar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -52,6 +55,19 @@
             app:srcCompat="@drawable/baseline_menu_24" />
 
         <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Смена учителя"
+            android:textStyle="bold"
+            android:textColor="@color/Basic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.019" />
+
+        <TextView
             android:id="@+id/getTeachersButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,22 +75,50 @@
             android:textColor="@color/Basic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintHorizontal_bias="0.479"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.355" />
+            app:layout_constraintVertical_bias="0.3" />
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Смена учителя"
-            android:textColor="@color/Basic"
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:background="@drawable/custom_spinner_background"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.019" />
+            app:layout_constraintVertical_bias="0.357" />
+
+        <TextView
+            android:id="@+id/singleTeacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.36"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/textview17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Basic"
+            android:text="Доступен только один учитель"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.335"
+            android:visibility="invisible"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

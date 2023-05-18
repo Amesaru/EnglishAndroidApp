@@ -6,12 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".ChangeFIO">
 
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_new_24"
+        app:tint="@color/Basic" />
+
+    <TextView
+        android:id="@+id/backToProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Вход"
+        android:textColor="@color/Basic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.084"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.019" />
+
     <Button
         android:id="@+id/confirmButton"
         android:layout_width="116dp"
         android:layout_height="31dp"
         android:autoSizeTextType="none"
         android:backgroundTint="@color/Basic"
+        android:background="@drawable/round_button"
+        android:textColor="#FBFBFB"
         android:paddingHorizontal="0.dp"
         android:paddingVertical="0.dp"
         android:text="Подтвердить"
@@ -73,6 +102,7 @@
         android:layout_height="wrap_content"
         android:text="Введение телеграма"
         android:textColor="@color/Basic"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

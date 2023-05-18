@@ -2,6 +2,7 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TeacherCreateHomework">
@@ -10,29 +11,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:background="@drawable/custom_spinner_background"
+            android:visibility="invisible"
+            android:textColor="@color/Basic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.12" />
+
+        <EditText
+            android:id="@+id/homeworkField"
+            android:layout_width="380dp"
+            android:layout_height="400dp"
+            android:textSize="12sp"
+            android:background="@drawable/rectangle_bubble"
+            android:gravity="top"
+            android:hint="Введите текст домашнего задания"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.528" />
+
         <Button
-            android:id="@+id/exitAccountButton3"
-            android:layout_width="147dp"
+            android:id="@+id/confirmButton"
+            android:layout_width="110dp"
             android:layout_height="30dp"
             android:autoSizeTextType="none"
+            android:background="@drawable/round_button"
             android:backgroundTint="@color/Basic"
+            android:gravity="center"
             android:paddingHorizontal="0.dp"
             android:paddingVertical="0.dp"
             android:text="Отправить"
             android:textAllCaps="false"
+            android:textColor="#FBFBFB"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.465"
+            app:layout_constraintHorizontal_bias="0.50"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.867" />
+            app:layout_constraintVertical_bias="0.89" />
 
         <TextView
-            android:id="@+id/changeFIOButton2"
-            android:layout_width="109dp"
+            android:id="@+id/chooseStudentButton"
+            android:layout_width="150dp"
             android:layout_height="25dp"
             android:gravity="center"
-            android:text="Получить ДЗ"
+            android:text="Выбрать студента"
             android:textColor="@color/Basic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -45,6 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Создание домашнего задания"
+            android:textStyle="bold"
             android:textColor="@color/Basic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -64,56 +99,32 @@
             app:layout_constraintVertical_bias="0.046"
             app:srcCompat="@drawable/baseline_menu_24" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="370dp"
+        <EditText
+            android:id="@+id/themeField"
+            android:layout_width="380dp"
             android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="279dp"
+            android:background="@drawable/rectangle_bubble"
+            android:hint="Тема"
+            android:padding="8dp"
+            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.12">
+            app:layout_constraintVertical_bias="0.178" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/Basic"
-                android:hint="Тема"
-                android:textColorHint="@color/Basic" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="370dp"
-            android:layout_height="430dp"
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="279dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="@color/Basic"
-                android:hint="Дз"
-                android:textColorHint="@color/Basic" />
-        </com.google.android.material.textfield.TextInputLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/sidebar"
-        android:background="@color/Basic"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/navigation_menu_student"
+        android:background="@color/Basic"
         app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"/>
+        app:itemTextColor="@color/white"
+        app:menu="@menu/navigation_menu_teacher" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -3,24 +3,20 @@ package com.example.test
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.example.test.databinding.ActivityMainBinding
-import java.io.BufferedReader
-import java.io.DataOutputStream
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import com.google.gson.Gson
-import com.google.gson.JsonElement
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
-
+import com.auth0.jwt.JWT
+import okhttp3.*
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
+import com.google.gson.JsonObject
 
 class MainActivity : AppCompatActivity() {
+
+    data class Body(val email: String, val password: String)
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var builder : AlertDialog.Builder
@@ -46,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        builder = AlertDialog.Builder(this)
+        builder = AlertDialog.Builder(this@MainActivity)
         setContentView(binding.root)
 
         binding.emailField.doAfterTextChanged {
@@ -57,6 +53,11 @@ class MainActivity : AppCompatActivity() {
                 binding.emailField.error = null
             }
         }
+
+//        binding.testButton.setOnClickListener {
+//
+//        }
+
         binding.signInButton.setOnClickListener {
             if (binding.emailField.text.toString().trim().isEmpty()) {
                 showAlert("Ошибка", "Не введена почта")
@@ -72,93 +73,81 @@ class MainActivity : AppCompatActivity() {
                 showAlert("Ошибка", "Некорректная почта")
                 return@setOnClickListener
             }
+            log("Start")
+            val requestBodyClass = Body(binding.emailField.text.toString(), binding.passwordField.text.toString())
 
-            val url = "http://localhost:8080/authApi/sign-in-request"
+            val jsonData = Gson().toJson(requestBodyClass)
 
-            val urlObj = URL(url)
+            val client = OkHttpClient()
 
-            data class Body(val email: String, val password: String)
+            val requestBody = jsonData.toRequestBody()
 
-            val requestBody = Body(binding.emailField.text.toString(), binding.passwordField.text.toString())
+            val request = Request.Builder()
+                .url("http://10.0.2.2:8080/authApi/sign-in-request")
+                .post(requestBody)
+                .header("Content-Type", "application/json")
+                .build()
 
-            val jsonData = Gson().toJson(requestBody)
+            client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    log("GetResponse")
+                    val responseCode = response.code
+                    if (responseCode != 200) {
+                        log("Response code$responseCode")
+                        runOnUiThread {
+                            showAlert("Ошибка", "Попробуйте снова")
+                        }
+                        return
+                    }
+                    val responseBodyString = response.body?.string()
+                    if (responseBodyString != null) {
+                        log(responseBodyString)
+                        val jsonObject = Gson().fromJson(responseBodyString, JsonObject::class.java)
+                        val success = jsonObject.get("success").asBoolean
+                        if (success == false) {
+                            log("no success")
+                            runOnUiThread {
+                                showAlert("Ошибка", jsonObject.get("reason").asString)
+                            }
+                            return
+                        } else {
+                            val data = jsonObject.getAsJsonObject("data")
+                            val accessToken = data.get("accessToken").asString
+                            val refreshToken = data.get("refreshToken").asString
+                            GlobalVars.accessToken = accessToken
+                            GlobalVars.refreshToken = refreshToken
+                            log(GlobalVars.accessToken)
+                            val decodedJWT = JWT.decode(accessToken)
+                            val role = decodedJWT.getClaim("role").asInt()
+                            if (role == 0) {
+                                startActivity(Intent(this@MainActivity, studentProfile::class.java))
+                            } else {
+                                startActivity(Intent(this@MainActivity, TeacherProfile::class.java))
+                            }
 
-            val connection = urlObj.openConnection() as HttpURLConnection
+                        }
 
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json")
-
-            connection.doOutput = true
-            connection.doInput = true
-
-            val jsonDataConverted = jsonData.toByteArray(Charsets.UTF_8)
-
-//                // Set the content length of the request body
-//                connection.setRequestProperty("Content-Length", data.size.toString())
-
-            val outputStream = DataOutputStream(connection.outputStream)
-            outputStream.write(jsonDataConverted)
-            outputStream.flush()
-            outputStream.close()
-
-            val responseCode = connection.responseCode
-
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = StringBuilder()
-            var line: String?
-
-            while (reader.readLine().also { line = it } != null) {
-                response.append(line)
-            }
-
-            reader.close()
-            connection.disconnect()
-
-            if (response.isEmpty()) {
-                log("NoData")
-                return@setOnClickListener
-            }
-
-            if (responseCode == 500) {
-                log("Response code 500")
-            }
-
-            val jsonResponse = response.toString()
-
-            val gson = Gson()
-            val jsonElement: JsonElement = gson.fromJson(jsonResponse, JsonElement::class.java)
-
-            // Access the accessToken field if it exists
-            if (jsonElement.isJsonObject) {
-                val jsonObject = jsonElement.asJsonObject
-                val success = jsonObject.get("success").asBoolean
-                if (success == false) {
-                    showAlert("Ошибка", "Неверная почта или пароль")
+                    }
                 }
 
-                val data = jsonObject.getAsJsonObject("data")
-                val accessToken = data.get("accessToken").asString
-                val refreshToken = data.get("refreshToken").asString
-
-                GlobalVars.accessToken = accessToken
-                GlobalVars.refreshToken = refreshToken
-
-                val jwt: Claims = Jwts.parserBuilder()
-                    .build()
-                    .parseClaimsJws(accessToken)
-                    .body
-
-                val role = jwt.get("role", Int::class.java)
-
-                if (role == 0) {
-                    startActivity(Intent(this, studentProfile::class.java))
-                } else {
-                    startActivity(Intent(this, TeacherProfile::class.java))
+                override fun onFailure(call: Call, e: IOException) {
+                    // Handle failure/error
+                    when (e) {
+                        is IOException -> {
+                            log("IO")
+                            e.printStackTrace()
+                        }
+                        is RuntimeException -> {
+                            log("RunTime")
+                            e.printStackTrace()
+                        }
+                        else -> {
+                            log("Other")
+                            e.printStackTrace()
+                        }
+                    }
                 }
-
-            } else {
-                println("Invalid JSON response.")
-            }
+            })
         }
 
         binding.registrationButton.setOnClickListener {

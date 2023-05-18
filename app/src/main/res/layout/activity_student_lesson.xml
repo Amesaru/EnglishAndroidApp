@@ -2,6 +2,7 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".StudentLesson">
@@ -9,6 +10,23 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="100dp"
+            android:layout_height="29dp"
+            android:autoSizeTextType="none"
+            android:background="@drawable/round_button"
+            android:backgroundTint="@color/Basic"
+            android:text="Подтвердить"
+            android:textAllCaps="false"
+            android:textColor="#FBFBFB"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.374" />
 
         <TextView
             android:id="@+id/textView17"
@@ -24,7 +42,7 @@
             app:layout_constraintVertical_bias="0.109" />
 
         <ImageView
-            android:id="@+id/imageView7"
+            android:id="@+id/openSidebar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -36,7 +54,7 @@
             app:srcCompat="@drawable/baseline_menu_24" />
 
         <TextView
-            android:id="@+id/textView18"
+            android:id="@+id/chooseTimeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Выбрать время"
@@ -53,6 +71,7 @@
             android:layout_height="wrap_content"
             android:text="Занятия"
             android:textColor="@color/Basic"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +79,7 @@
             app:layout_constraintVertical_bias="0.019" />
 
         <EditText
-            android:id="@+id/emailField2"
+            android:id="@+id/dateField"
             android:layout_width="206dp"
             android:layout_height="42dp"
             android:backgroundTint="@color/Basic"
@@ -75,15 +94,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.15" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:background="@drawable/custom_spinner_background"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.265" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/sidebar"
-        android:background="@color/Basic"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/navigation_menu_student"
+        android:background="@color/Basic"
         app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"/>
+        app:itemTextColor="@color/white"
+        app:menu="@menu/navigation_menu_student" />
 </androidx.drawerlayout.widget.DrawerLayout>

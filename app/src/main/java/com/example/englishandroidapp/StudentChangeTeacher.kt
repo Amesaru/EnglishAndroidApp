@@ -1,28 +1,53 @@
 package com.example.test
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
-import com.example.test.databinding.ActivityChangeTelegramBinding
+import com.auth0.jwt.JWT
 import com.example.test.databinding.ActivityStudentChangeTeacherBinding
-import com.example.test.databinding.ActivityStudentProfileBinding
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import java.io.BufferedReader
-import java.io.DataOutputStream
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+import com.google.gson.JsonObject
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import java.io.IOException
+
+
+//class CustomArrayAdapter(context: Context, items: ArrayList<String>) :
+//    ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, items) {
+//
+//    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+//        val view = super.getDropDownView(position, convertView, parent)
+//        val textView = view.findViewById<TextView>(android.R.id.text1)
+//        textView.visibility = View.VISIBLE
+//        textView.setTextColor(Color.BLACK) // Adjust text color if needed
+//        return view
+//    }
+//}
 
 class StudentChangeTeacher : AppCompatActivity() {
 
     private lateinit var binding : ActivityStudentChangeTeacherBinding
     private lateinit var builder : AlertDialog.Builder
+    private var cur_teacher_id: String = ""
+
+    private var name_arr = ArrayList<String>()
+    private var id_arr = ArrayList<String>()
+
 
     private fun showAlert(Title: String, Message: String) {
         builder.setTitle(Title)
@@ -32,7 +57,143 @@ class StudentChangeTeacher : AppCompatActivity() {
     }
 
     private fun log(Message: String) {
-        Log.d("LoginLog", Message)
+        Log.d("StudentChangeTeacherLog", Message)
+    }
+
+    private fun updateTokens() {
+        log("UpdateTokens")
+        val requestBodyClass = studentProfile.refreshBody(GlobalVars.refreshToken)
+
+        val jsonData = Gson().toJson(requestBodyClass)
+
+        val client = OkHttpClient()
+
+        val requestBody = jsonData.toRequestBody()
+
+        val request = Request.Builder()
+            .url("http://10.0.2.2:8080/authApi/refresh")
+            .post(requestBody)
+            .header("Content-Type", "application/json")
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                log("GetResponse")
+                val responseCode = response.code
+                if (responseCode != 200) {
+                    log("Response code $responseCode")
+                    runOnUiThread {
+                        showAlert("Ошибка", "Попробуйте снова")
+                    }
+                    return
+                }
+                val responseBodyString = response.body?.string()
+                if (responseBodyString != null) {
+                    log(responseBodyString)
+                    val jsonObject = Gson().fromJson(responseBodyString, JsonObject::class.java)
+                    val success = jsonObject.get("success").asBoolean
+                    if (success == false) {
+                        log("no success")
+                        runOnUiThread {
+                            showAlert("Ошибка", jsonObject.get("reason").asString)
+                        }
+                        return
+                    } else {
+                        val data = jsonObject.getAsJsonObject("data")
+                        val accessToken = data.get("accessToken").asString
+                        val refreshToken = data.get("refreshToken").asString
+                        GlobalVars.accessToken = accessToken
+                        GlobalVars.refreshToken = refreshToken
+                    }
+
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle failure/error
+                when (e) {
+                    is IOException -> {
+                        log("IO")
+                        e.printStackTrace()
+                    }
+                    is RuntimeException -> {
+                        log("RunTime")
+                        e.printStackTrace()
+                    }
+                    else -> {
+                        log("Other")
+                        e.printStackTrace()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun getTeachers() {
+        name_arr.clear()
+        id_arr.clear()
+        log("Start")
+        val client = OkHttpClient()
+
+        val request = Request.Builder()
+            .url("http://10.0.2.2:8080/profileApi/teachersAll")
+            .get()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + GlobalVars.accessToken)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                log("GetResponse")
+                val responseCode = response.code
+                if (responseCode != 200) {
+                    log("Response code $responseCode")
+                    runOnUiThread {
+                        showAlert("Ошибка", "Попробуйте снова")
+                    }
+                    return
+                }
+                val responseBodyString = response.body?.string()
+                if (responseBodyString != null) {
+                    log(responseBodyString)
+                    val jsonObject = Gson().fromJson(responseBodyString, JsonObject::class.java)
+                    val success = jsonObject.get("success").asBoolean
+                    if (success == false) {
+                        log("no success")
+                        runOnUiThread {
+                            showAlert("Ошибка", jsonObject.get("reason").asString)
+                        }
+                        return
+                    } else {
+                        val data = jsonObject.getAsJsonArray("data")
+                        for (teacher in data) {
+                            val teacherObject = teacher.asJsonObject
+                            name_arr.add(teacherObject.get("fio").asString)
+                            id_arr.add(teacherObject.get("id").asString)
+                        }
+                    }
+
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle failure/error
+                when (e) {
+                    is IOException -> {
+                        log("IO")
+                        e.printStackTrace()
+                    }
+                    is RuntimeException -> {
+                        log("RunTime")
+                        e.printStackTrace()
+                    }
+                    else -> {
+                        log("Other")
+                        e.printStackTrace()
+                    }
+                }
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,83 +208,138 @@ class StudentChangeTeacher : AppCompatActivity() {
 
         binding.sidebar.setNavigationItemSelectedListener {
             when(it.itemId) {
-                R.id.nav_homework -> startActivity(Intent(this@studentProfile, StudentHomework::class.java))
-                R.id.nav_lesson -> startActivity(Intent(this@studentProfile, StudentLesson::class.java))
-                R.id.nav_teacher -> startActivity(Intent(this@studentProfile, StudentChangeTeacher::class.java))
+                R.id.nav_profile -> {
+                    updateTokens()
+                    startActivity(Intent(this, studentProfile::class.java))
+                }
+                R.id.nav_lesson -> {
+                    updateTokens()
+                    startActivity(Intent(this, StudentLesson::class.java))
+                }
+                R.id.nav_homework -> {
+                    updateTokens()
+                    startActivity(Intent(this, StudentHomework::class.java))
+                }
+                R.id.nav_teacher -> {
+                    updateTokens()
+                    startActivity(Intent(this, StudentChangeTeacher::class.java))
+                }
             }
+            true
         }
 
         binding.getTeachersButton.setOnClickListener {
-
-            val url = "http://localhost:8080/authApi/teachersAll"
-
-            val urlObj = URL(url)
-
-            val connection = urlObj.openConnection() as HttpURLConnection
-
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("Content-Type", "application/json")
-            connection.setRequestProperty("Authorization", "Bearer" + GlobalVars.accessToken)
-
-            connection.doOutput = true
-            connection.doInput = true
-
-//                // Set the content length of the request body
-//                connection.setRequestProperty("Content-Length", data.size.toString())
-
-            val outputStream = DataOutputStream(connection.outputStream)
-            outputStream.flush()
-            outputStream.close()
-
-            val responseCode = connection.responseCode
-
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = StringBuilder()
-            var line: String?
-
-            while (reader.readLine().also { line = it } != null) {
-                response.append(line)
+            binding.singleTeacher.visibility = View.INVISIBLE
+            binding.textview17.visibility = View.INVISIBLE
+            binding.spinner.visibility = View.INVISIBLE
+            getTeachers()
+            Thread.sleep(1000)
+            binding.spinner.visibility = View.VISIBLE
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, name_arr)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spinner.adapter = adapter
+            binding.spinner.performClick()
+            binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    val selectedItem = parent?.getItemAtPosition(position).toString()
+                    val selectedIndex = position
+                    cur_teacher_id = id_arr[position]
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // Handle case when nothing is selected
+                }
             }
+//            if (name_arr.size == 1) {
+//                binding.singleTeacher.text = name_arr[0]
+//                binding.singleTeacher.visibility = View.VISIBLE
+//                binding.textview17.visibility = View.VISIBLE
+//                cur_teacher_id = id_arr[0]
+//            } else {
+//                binding.spinner.visibility = View.VISIBLE
+//                val adapter = CustomArrayAdapter(this@StudentChangeTeacher, name_arr)
+//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//                binding.spinner.adapter = adapter
+//                binding.spinner.performClick()
+//                binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                        val selectedItem = parent?.getItemAtPosition(position).toString()
+//                        val selectedIndex = position
+//                        cur_teacher_id = id_arr[position]
+//                    }
+//                    override fun onNothingSelected(parent: AdapterView<*>?) {
+//                        // Handle case when nothing is selected
+//                    }
+//                }
+//            }
+        }
 
-            reader.close()
-            connection.disconnect()
-
-            if (response.isEmpty()) {
-                log("NoData")
+        binding.confirmButton.setOnClickListener {
+            if (cur_teacher_id == "") {
+                showAlert("Ошибка", "Выберите учителя")
                 return@setOnClickListener
             }
 
-            if (responseCode == 500) {
-                log("Response code 500")
-            }
+            log("Start")
+            val decodedJWT = JWT.decode(GlobalVars.accessToken)
+            val id = decodedJWT.getClaim("jti").asString()
 
-            val jsonResponse = response.toString()
+            val client = OkHttpClient()
 
-            val gson = Gson()
-            val jsonElement: JsonElement = gson.fromJson(jsonResponse, JsonElement::class.java)
+            log("http://10.0.2.2:8080/managerApi/attachStudentToTeacher/$id/$cur_teacher_id")
+            val request = Request.Builder()
+                .url("http://10.0.2.2:8080/managerApi/attachStudentToTeacher/$id/$cur_teacher_id")
+                .get()
+                .header("Content-Type", "application/json")
+                .build()
 
-            // Access the accessToken field if it exists
-            if (jsonElement.isJsonObject) {
-                var name_arr: MutableList<String> = ArrayList()
-                var id_arr: MutableList<String>  = ArrayList()
-                val jsonObject = jsonElement.asJsonObject
-                val success = jsonObject.get("success").asBoolean
-                if (success == false) {
-                    showAlert("Ошибка", "Неверная почта или пароль")
+            client.newCall(request).enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    log("GetResponse")
+                    val responseCode = response.code
+                    if (responseCode != 200) {
+                        log("Response code$responseCode")
+                        runOnUiThread {
+                            showAlert("Ошибка", "Попробуйте снова")
+                        }
+                        return
+                    }
+                    val responseBodyString = response.body?.string()
+                    if (responseBodyString != null) {
+                        log(responseBodyString)
+                        val jsonObject = Gson().fromJson(responseBodyString, JsonObject::class.java)
+                        val success = jsonObject.get("success").asBoolean
+                        if (success == false) {
+                            log("no success")
+                            runOnUiThread {
+                                showAlert("Ошибка", jsonObject.get("reason").asString)
+                            }
+                        } else {
+                            runOnUiThread {
+                                showAlert("Успех", "Учитель изменен")
+                            }
+                        }
+
+                    }
                 }
 
-                val data = jsonObject.getAsJsonObject("data")
-
-                for teacher in data {
-                    if (teacher['fio'] != "") {
-                        name_arr.add(teacher['fio'])
-                        id_arr.add(teacher['id'])
+                override fun onFailure(call: Call, e: IOException) {
+                    // Handle failure/error
+                    when (e) {
+                        is IOException -> {
+                            log("IO")
+                            e.printStackTrace()
+                        }
+                        is RuntimeException -> {
+                            log("RunTime")
+                            e.printStackTrace()
+                        }
+                        else -> {
+                            log("Other")
+                            e.printStackTrace()
+                        }
                     }
-                 }
-
-            } else {
-                println("Invalid JSON response.")
-            }
+                }
+            })
         }
     }
 }

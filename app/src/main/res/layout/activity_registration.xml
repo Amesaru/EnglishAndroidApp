@@ -4,24 +4,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/Basic"
     tools:context=".Registration">
 
+    <LinearLayout
+        android:id="@+id/toggleGroup"
+        android:layout_width="130dp"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.67">
+
+        <ToggleButton
+            android:id="@+id/studentButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_selector"
+            android:checked="true"
+            android:textAllCaps="false"
+            android:textColor="@drawable/button_text_selector"
+            android:textOff="Студент"
+            android:textOn="Студент"
+            android:textSize="12sp" />
+
+        <ToggleButton
+            android:id="@+id/teacherButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_selector"
+            android:checked="false"
+            android:textAllCaps="false"
+            android:textColor="@drawable/button_text_selector"
+            android:textOff="Учитель"
+            android:textOn="Учитель"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+
     <Button
-        android:id="@+id/confirmButton"
-        android:layout_width="148dp"
-        android:layout_height="35dp"
+        android:id="@+id/registrationButton"
+        android:layout_width="155dp"
+        android:layout_height="30dp"
         android:autoSizeTextType="none"
+        android:background="@drawable/round_button"
         android:backgroundTint="@color/Basic"
         android:paddingHorizontal="0.dp"
         android:paddingVertical="0.dp"
-        android:text="Зарегестрироваться"
+        android:text="Зарегистрироваться"
         android:textAllCaps="false"
+        android:textColor="#FBFBFB"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.653" />
+        app:layout_constraintVertical_bias="0.746" />
 
     <EditText
         android:id="@+id/passwordField2"
@@ -91,10 +134,52 @@
         android:layout_height="wrap_content"
         android:text="Регистрация"
         android:textColor="@color/Basic"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.019" />
+
+    <TextView
+        android:id="@+id/BackToLogIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Вход"
+        android:textColor="@color/Basic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.084"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.019" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="#FFFFFF"
+        app:tint="@color/Basic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_new_24" />
+
+    <TextView
+        android:id="@+id/textView24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выберите роль"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.623" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

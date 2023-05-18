@@ -5,7 +5,8 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".studentProfile">
+    tools:context=".studentProfile"
+    tools:openDrawer="end">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,10 +20,36 @@
             android:textColor="@color/Basic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.771"
+            app:layout_constraintHorizontal_bias="0.83"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.375" />
+
+        <TextView
+            android:id="@+id/changeTGButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ввести"
+            android:textColor="@color/Basic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.83"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.563" />
+
+        <TextView
+            android:id="@+id/changePhoneButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ввести"
+            android:textColor="@color/Basic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.83"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.463" />
 
         <ImageView
             android:id="@+id/imageView4"
@@ -35,19 +62,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.081"
             app:srcCompat="@drawable/englishsecond" />
-
-        <TextView
-            android:id="@+id/changePhoneButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ввести"
-            android:textColor="@color/Basic"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.772"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.464" />
 
         <TextView
             android:id="@+id/textView9"
@@ -63,10 +77,11 @@
             app:layout_constraintVertical_bias="0.348" />
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/FioField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Лукас"
+            android:text="Не введено"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.048"
@@ -75,10 +90,11 @@
             app:layout_constraintVertical_bias="0.375" />
 
         <TextView
-            android:id="@+id/textView15"
+            android:id="@+id/TgField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="LucasGvasalia"
+            android:text="Не введено"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.049"
@@ -87,11 +103,12 @@
             app:layout_constraintVertical_bias="0.566" />
 
         <TextView
-            android:id="@+id/textView16"
+            android:id="@+id/teacherField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Учителов Илья Георгеевич"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.068"
             app:layout_constraintStart_toStartOf="parent"
@@ -112,7 +129,7 @@
             app:layout_constraintVertical_bias="0.644" />
 
         <ImageView
-            android:id="@+id/imageView5"
+            android:id="@+id/updateInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -129,6 +146,7 @@
             android:layout_height="wrap_content"
             android:text="Профиль"
             android:textColor="@color/Basic"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -149,10 +167,11 @@
             app:layout_constraintVertical_bias="0.442" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/PhoneField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+7925383364"
+            android:text="Не введено"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.049"
@@ -173,25 +192,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.539" />
 
-        <TextView
-            android:id="@+id/cahngeTGButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ввести"
-            android:textColor="@color/Basic"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.772"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.563" />
-
         <Button
             android:id="@+id/exitAccountButton"
             android:layout_width="147dp"
             android:layout_height="30dp"
             android:autoSizeTextType="none"
             android:backgroundTint="@color/Basic"
+            android:background="@drawable/round_button"
+            android:textColor="#FBFBFB"
             android:paddingHorizontal="0.dp"
             android:paddingVertical="0.dp"
             android:text="Выйти из аккаунта"
